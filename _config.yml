@@ -11,8 +11,8 @@ description:
 footer_text: 
 keywords: 
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
-icon: ⚛️ # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
-apple_touch_icon: 
+icon: favicon.svg # file in /assets/img/. A name longer than 4 chars is treated as a filename, 4 or fewer as an emoji.
+apple_touch_icon: apple-touch-icon.png # 180x180 PNG; Safari ignores an SVG favicon for home-screen bookmarks
 url: https://cbrell.github.io # the base hostname & protocol for your site
 baseurl:  # the subpath of your site, e.g. /blog/. Leave blank for root
 last_updated: false # set to true if you want to display last updated in the footer
