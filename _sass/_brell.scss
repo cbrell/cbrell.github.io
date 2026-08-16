@@ -1,0 +1,190 @@
+/*******************************************************************************
+ * Site theme — cbrell.github.io
+ *
+ * Loaded LAST from assets/css/main.scss, so everything here wins over the
+ * al_folio_core defaults without shadowing any gem partial. Colours are
+ * overridden as CSS custom properties (the gem sets them on :root in
+ * _themes.scss); a later :root block simply redefines them.
+ *
+ * Fonts are served from assets/fonts/ — no Google Fonts request.
+ ******************************************************************************/
+
+/* --- Vendored webfonts ---------------------------------------------------- */
+/* Latin subset only. IBM Plex Sans is a variable font, so one file covers
+   every weight we use; Spectral ships static instances, hence two files.
+ *
+ * KEEP THESE URLS RELATIVE. An absolute "/assets/fonts/..." here makes
+ * jekyll-cache-bust slice the path at its first "assets/" occurrence
+ * (see file_content in al_folio_core.rb) and it then relocates
+ * assets/css/main.scss to assets/fonts/assets/css/main.scss in the SOURCE
+ * tree, silently dropping this whole file from the build. "../fonts/x.woff2"
+ * resolves correctly from /assets/css/main.css and avoids it. */
+
+$latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+  U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+  U+2215, U+FEFF, U+FFFD;
+
+@font-face {
+  font-family: "Spectral";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/spectral-400.woff2") format("woff2");
+  unicode-range: $latin;
+}
+
+@font-face {
+  font-family: "Spectral";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/spectral-600.woff2") format("woff2");
+  unicode-range: $latin;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 100 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("../fonts/ibm-plex-sans.woff2") format("woff2");
+  unicode-range: $latin;
+}
+
+/* --- Design tokens -------------------------------------------------------- */
+
+:root {
+  /* Teal accent. Chosen as the darkest value that still clears both contrast
+     thresholds on this background: 5.77:1 against #fdfcfa, and 3.04:1 against
+     the body text — the latter matters because inline links carry no underline
+     until hover, so colour alone has to distinguish them.
+     It clears 3.0 by 0.04. If the background or body colour is ever changed,
+     re-check it before shipping. */
+  --global-theme-color: #146f75;
+  --global-hover-color: #146f75;
+  --global-hover-text-color: #ffffff;
+
+  --global-bg-color: #fdfcfa;
+  --global-card-bg-color: #fdfcfa;
+  --global-code-bg-color: rgba(20, 111, 117, 0.06);
+
+  --global-text-color: #14171a;
+  --global-text-color-light: #5f6772;
+  --global-divider-color: rgba(20, 23, 26, 0.1);
+
+  --global-font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --global-font-serif: "Spectral", Georgia, "Times New Roman", serif;
+}
+
+/* --- Typography ----------------------------------------------------------- */
+
+html,
+body {
+  background-color: var(--global-bg-color);
+}
+
+body {
+  font-family: var(--global-font-sans);
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--global-text-color);
+}
+
+/* Spectral carries the top of the hierarchy. */
+h1,
+h2,
+h3,
+.post-title,
+.page-title,
+.profile .name {
+  font-family: var(--global-font-serif);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* Below h3 a heading is barely larger than body text, so size stops signalling
+   hierarchy. Switch to the body face and let the change of voice do it. */
+h4 {
+  font-family: var(--global-font-sans);
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+
+h5,
+h6 {
+  font-family: var(--global-font-sans);
+  font-weight: 600;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--global-text-color-light);
+}
+
+/* --- Links ---------------------------------------------------------------- */
+
+/* Inline links stay quiet: colour only, underline on hover. Prose is the
+   common case, and persistent underlines break up a paragraph. */
+a {
+  color: var(--global-theme-color);
+  text-decoration: none;
+}
+
+p a:hover,
+li a:hover,
+td a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* Standalone links are the calls to action — a JMP PDF, a CV — and sit on
+   their own line, so they can be emphatic without disturbing anything.
+   Use in Markdown with kramdown's attribute syntax:
+     [Download the job market paper (PDF)](/assets/pdf/jmp.pdf){:.cta}
+     [CV (PDF)](/assets/pdf/cv.pdf){:.btn-outline} */
+a.cta {
+  display: inline-block;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+a.cta:hover {
+  text-decoration-thickness: 2px;
+}
+
+a.btn-outline {
+  display: inline-block;
+  padding: 0.32rem 0.8rem;
+  margin: 0.15rem 0.3rem 0.15rem 0;
+  border: 1px solid var(--global-theme-color);
+  border-radius: 5px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a.btn-outline:hover {
+  background-color: var(--global-theme-color);
+  color: var(--global-hover-text-color);
+  text-decoration: none;
+}
+
+/* Nav and heading anchors never get underlines. */
+nav a,
+.navbar a,
+h1 a,
+h2 a,
+h3 a,
+h4 a {
+  text-decoration: none;
+}
+
+/* --- Profile -------------------------------------------------------------- */
+
+/* Square crop: more forgiving of an off-centre headshot than a circle. */
+.profile img {
+  border-radius: 4px;
+}

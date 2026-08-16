@@ -18,8 +18,6 @@ latest_posts:
   enabled: false
 ---
 
-# Courtney Brell
-
 This site is being built. A full profile, research papers, and CV will be posted here shortly.
 
 In the meantime, please get in touch by email.
