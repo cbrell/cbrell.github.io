@@ -8,7 +8,9 @@ _site
 .sass-cache
 .tweet-cache
 .venv
-assets/libs/
+# assets/libs/ is intentionally tracked: vendored copies of FontAwesome,
+# Academicons, MathJax, Google Fonts etc. are committed so builds make no
+# network calls. Delete a subfolder to force a re-download of that library.
 assets/rendercv/rendercv_output/*.typ
 al-folio-upgrade-report.md
 node_modules/

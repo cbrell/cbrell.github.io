@@ -1,91 +1,66 @@
-# Agent Guidelines for al-folio (v1.x)
+# Agent guidelines — cbrell.github.io
 
-**This file is the authoritative entry point for coding agents working in this repo.** Read it before making any change. It is intentionally short and tool-neutral; it links to the one place each longer-form fact lives.
+This is **Courtney Brell's personal academic website**, not a copy of the al-folio project. It was forked from the al-folio v1 starter and then stripped down. The upstream project's contributor rules do **not** apply here; an archived copy of them lives in `reference/` for lookup only.
 
-`al-folio` v1.x is a **thin Jekyll starter, not a theme**. This repo owns starter wiring, example content, docs, and cross-plugin tests. All runtime — layouts, includes, Sass, Liquid tags, filters, feature JS — lives in versioned gems published under [`al-org-dev`](https://github.com/al-org-dev).
+Read this file before making changes.
 
-## Route your change
+## What the site is for
 
-Find your change on the left; edit only what is on the right.
+An academic job market site. The audience is hiring committee members and letter writers who will spend well under a minute on it. Priorities, in order:
 
-| Your change                                                                                                              | Goes in                                                                                                       |
-| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| Dependency pin, plugin activation, feature flag                                                                          | this repo: `Gemfile` **and** `_config.yml` (both — see below)                                                 |
-| Example/demo content, bibliography, data files                                                                           | this repo: `_pages`, `_posts`, `_projects`, `_news`, `_teachings`, `_books`, `_data`                          |
-| Documentation                                                                                                            | this repo: `docs/` (long-form) or this file (agent rules)                                                     |
-| Cross-plugin integration test, visual parity test                                                                        | this repo: `test/integration_*.sh`, `test/visual/`                                                            |
-| Plugin catalog metadata                                                                                                  | this repo: `_data/featured_plugins.yml`                                                                       |
-| A layout, include, or Sass partial                                                                                       | the owning gem — start with `al_folio_core`                                                                   |
-| A Liquid tag or filter, or what a tag renders                                                                            | the gem that registers it — see the [delegation table](docs/ARCHITECTURE.md#wrapper-to-tag-to-gem-delegation) |
-| Feature behavior (search, math, charts, comments, cookies, icons, CV, distill, analytics, images, newsletter, citations) | that feature's gem — see [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md)                                           |
-| Component/unit test for gem-owned behavior                                                                               | the owning gem, not here                                                                                      |
-| A feature with no existing owner                                                                                         | open a plugin proposal issue first, then a standalone plugin repo                                             |
+1. **Never be broken.** A failed deploy or a dead PDF link is the worst outcome.
+2. **Fast and readable on a phone.**
+3. **Conventional.** This is not a site that should be visually interesting.
 
-[`docs/BOUNDARIES.md`](docs/BOUNDARIES.md) is the authoritative area-to-gem table. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) explains how the pieces connect.
+Prefer removing things over adding them. Every feature is a thing that can fail.
 
-## Stop sign
+## Architecture in one paragraph
 
-**If your change would create any of these paths in this repo, it belongs in a gem instead:**
+Layouts, includes, Sass and Liquid tags live in **gems** (`al_folio_core` and the other `al_*` gems in the `Gemfile`), not in this repo — which is why there is no `_layouts/` or `_includes/` directory. This repo holds content and configuration.
 
-```
-_layouts/   _includes/   _sass/   _scripts/   assets/tailwind/   tailwind.config.js   assets/webfonts/
+**Overriding a gem-owned file is allowed here.** Create `_layouts/page.liquid` (or `_includes/…`, `_sass/…`) locally and Jekyll will use your copy instead of the gem's. This has been tested and works. Copy the original out of the gem first:
+
+```bash
+cp "$(bundle info al_folio_core --path)/_layouts/page.liquid" _layouts/
 ```
 
-`npm run lint:style-contract` fails CI when any of them exists here, and it also rejects `build:css` / `build:tailwind` npm scripts. Do not add a starter-local Tailwind or CSS build pipeline.
+Note that an override is a frozen copy: it will not pick up gem improvements later.
 
-This restriction applies to **this repo only**. A user's own site created from this template _may_ legally shadow gem-owned files — see [local overrides: your site vs. this repo](docs/ARCHITECTURE.md#local-overrides-your-site-vs-this-repo).
+## The rule that matters most
 
-## Three failures that produce no error message
+**Do not run `bundle update`.** Every gem is pinned to an exact version in the `Gemfile`, with checksums in `Gemfile.lock`. That combination is why the build is reproducible. Leave it frozen for the duration of the job market; upgrade in the off-season, deliberately, with time to test.
 
-Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#failure-modes-that-produce-no-error-message) for the full explanation. The short version:
+## Two lists that must agree
 
-1. **Features fail silently.** A feature renders only when its gem is loaded _and_ its flag is on _and_ the page opts in. Otherwise the Liquid tag emits an empty string — no warning, no error.
-2. **`Gemfile` and `_config.yml` are two lists that must agree.** A plugin in only one of them is inert. Adding or removing a plugin means editing both. Repo dirs use hyphens (`al-folio-core`); gem/plugin ids use underscores (`al_folio_core`).
-3. **This repo's effective baseurl is `/al-folio`.** `_config.yml` already sets it, so a plain `bundle exec jekyll build` is correct — that is what `deploy.yml`, `broken-links-site.yml` and `axe.yml` run. Passing `--baseurl /al-folio` is redundant but harmless; blanking the baseurl out is what renders the site unstyled with broken links. Dev server is at `http://localhost:4000/al-folio/`.
+Adding or removing a plugin means editing **both** the `Gemfile` and the `plugins:` list in `_config.yml`. A plugin present in only one of them is inert — the associated Liquid tag renders an empty string, with no warning and no error. This is the most common way to lose an hour here.
 
-## Validated local command set
+## No build-time network calls
 
-Run from the repo root, in this order:
+The build must not depend on any third-party server being up, because that turns someone else's outage into a failed deploy. Deliberately disabled:
+
+- `external_sources` — pulled RSS from Medium and blog.google at build time
+- `jekyll_get_json` — fetched JSON Resume data
+- the Google Scholar citation scraper and its workflow
+- `enable_publication_badges` — Altmetric, Dimensions, Scholar, InspireHEP
+
+`third_party_libraries.download: true` also vendors FontAwesome, Academicons, MathJax, Google Fonts and the rest into the build, so visitors' browsers make no CDN calls either. **Keep it that way.** If you need external data, fetch it once and commit the result.
+
+## Commands
 
 ```bash
 bundle install
-npm ci
-npm run lint:prettier
-npm run lint:style-contract
-bundle exec jekyll build --baseurl /al-folio
-bash test/integration_comments.sh
-bash test/integration_plugin_toggles.sh
-bash test/integration_distill.sh
-bash test/integration_bootstrap_compat.sh
-bash test/integration_upgrade_cli.sh
-bash test/integration_css_minify.sh
-bash test/integration_new_plugins.sh
-npx playwright install chromium webkit
-npm run test:visual
-bundle exec al-folio upgrade audit
-bundle exec al-folio upgrade overrides audit
-bundle exec al-folio upgrade report
-docker compose up -d
-curl -fsS http://127.0.0.1:8080/al-folio/ >/dev/null
-docker compose logs --tail=80
-docker compose down
+bundle exec jekyll serve                      # http://localhost:4000
+JEKYLL_ENV=production bundle exec jekyll build
 ```
 
-All seven `test/integration_*.sh` scripts are gated by `unit-tests.yml`; run the ones your change touches. Docker note: v1 uses `/srv/jekyll/bin/entry_point.sh` and serves from container-local `/tmp/_site` to avoid host bind-mount write deadlocks.
+Needs ImageMagick on `PATH`. On a machine with a non-UTF-8 locale, prefix with `LANG=C.UTF-8 LC_ALL=C.UTF-8`.
 
-## Before you open a PR
+## Deployment
 
-- Keep starter work here; route runtime behavior to the owning plugin repo.
-- Run `npm run lint:prettier` (Prettier with `@shopify/prettier-plugin-liquid`, `printWidth: 150`). `npx prettier . --write` fixes formatting.
-- Keep docs aligned with v1 ownership, and keep each fact in one place — link rather than restate.
-- If you create or keep local overrides of plugin-owned files, run `bundle exec al-folio upgrade overrides audit` and commit `.al-folio-overrides.yml` after review.
+`main` → `.github/workflows/deploy.yml` → `gh-pages`. Only four workflows remain (`deploy`, `render-cv`, `axe`, `broken-links-site`); the rest were al-folio project CI and were removed. Don't add workflows back without a reason.
 
-## Further reading
+## Gotchas
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how the starter and gems fit together, silent failure modes, the v1 config contract, local overrides.
-- [`docs/BOUNDARIES.md`](docs/BOUNDARIES.md) — authoritative area-to-gem ownership table and PR triage playbook.
-- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — contributor workflow and agent tooling.
-- [`docs/README.md`](docs/README.md) — index of all user and maintainer guides.
-- `.agents/skills/al-folio-bootstrap/SKILL.md` — new-site setup workflow.
-- `.agents/skills/al-folio-v1-migration/SKILL.md` — customized-fork migration and override drift auditing.
-- `.codex/skills` and `.claude/skills` are symlinks to `.agents/skills` for agent-specific discovery.
+- `baseurl` is intentionally **blank** (this is a user page at the domain root). Do not set it to `/al-folio` — the archived upstream docs say to, and that advice is wrong for this repo.
+- `reference/` is excluded from the build and is disposable.
+- The `Gemfile` still carries gems for features the site does not use (charts, distill, marimo, RTL, comments, newsletter). Harmless — they cost a couple of seconds of build time. Prune them later, once the content is settled, not before.

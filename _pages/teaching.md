@@ -2,14 +2,17 @@
 layout: page
 permalink: /teaching/
 title: teaching
-description: Course materials, schedules, and resources for classes taught.
-nav: true
-nav_order: 6
-calendar: true
+description:
+nav: false
+nav_order: 3
 ---
 
-This page displays a collection of courses with detailed schedules, materials, and resources. You can organize your courses by years, terms, or topics.
+<!--
+Teaching content goes in the _teachings/ collection (one file per course).
+Set `nav: true` above once there is something here to show.
 
-{% include calendar.liquid calendar_id='test@gmail.com' timezone='Asia/Shanghai' %}
-
-{% include courses.liquid %}
+The template also supports a Google Calendar embed via
+{% raw %}{% include calendar.liquid calendar_id='...' timezone='...' %}{% endraw %}
+and a course list via {% raw %}{% include courses.liquid %}{% endraw %} — both removed for now
+because the demo pointed at a placeholder calendar.
+-->
