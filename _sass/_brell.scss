@@ -87,6 +87,10 @@ body {
 body {
   font-family: var(--global-font-sans);
   font-size: 16.5px;
+  /* 450, not 400. Plex Sans has a smallish x-height and reads thin at 400 on a
+     light ground. Because the file is a variable font any weight in 100-700 is
+     free — no extra request, no extra bytes. */
+  font-weight: 450;
   line-height: 1.65;
   color: var(--global-text-color);
 }
@@ -105,16 +109,18 @@ h3,
 
 /* Below h3 a heading is barely larger than body text, so size stops signalling
    hierarchy. Switch to the body face and let the change of voice do it. */
+/* 620 rather than 600: hierarchy is relative, so raising the body to 450 needs
+   a matching nudge here or a small heading stops separating from its prose. */
 h4 {
   font-family: var(--global-font-sans);
-  font-weight: 600;
+  font-weight: 620;
   font-size: 1.02rem;
 }
 
 h5,
 h6 {
   font-family: var(--global-font-sans);
-  font-weight: 600;
+  font-weight: 620;
   font-size: 0.86rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
