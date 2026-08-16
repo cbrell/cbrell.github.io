@@ -2,23 +2,26 @@
 # .github/workflows/render-cv.yml (rendercv) on pushes to main.
 #
 # Everything below is a placeholder skeleton — replace with real details.
-# Keep the key names as they are; rendercv validates against them.
-# Delete any section you don't need rather than leaving it empty.
+#
+# IMPORTANT: rendercv rejects unknown keys under `cv:`. Only these are allowed:
+#   name, email, phone, location, website, photo, social_networks,
+#   sort_entries, sections
+# The al-folio web CV template additionally reads `label` and `summary`, but
+# adding them fails the render-cv workflow ("This field is unknown for this
+# object"). rendercv wins, since the PDF is what people download; put the
+# title line and summary on the about page instead.
 
 cv:
   name: Courtney Brell
-  label: PhD Candidate
   email:
   location:
-  image: ""
-  summary:
 
   sections:
     Education:
       - institution: University
         location:
         area: Field
-        studyType: PhD
+        degree: PhD
         start_date: 2021
         end_date: 2027
         highlights:
